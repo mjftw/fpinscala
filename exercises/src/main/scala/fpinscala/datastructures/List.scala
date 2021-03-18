@@ -92,7 +92,7 @@ object List { // `List` companion object. Contains functions for creating and wo
       case Nil           => as
       case Cons(Nil, tl) => flattenAcc(tl, as)
       case Cons(Cons(hlh, hlt), tl) =>
-        flattenAcc(Cons(hlt, tl), Cons(hlh, as))
+        Cons(hlh, flattenAcc(Cons(hlt, tl), as))
     }
 
     flattenAcc[A](ll, Nil)
