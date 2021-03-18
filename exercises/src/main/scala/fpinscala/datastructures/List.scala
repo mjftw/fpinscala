@@ -61,9 +61,42 @@ object List { // `List` companion object. Contains functions for creating and wo
       _ * _
     ) // `_ * _` is more concise notation for `(x,y) => x * y`; see sidebar
 
-  def tail[A](l: List[A]): List[A] = ???
+  def isSorted[A](as: Array[A], ordered: (A, A) => Boolean): Boolean = {
+    @annotation.tailrec
+    def loop(as: Array[A]): Boolean = {
+      if (as.length < 2) true
+      else if (ordered(as(0), as(1))) loop(as.drop(1))
+      else false
+    }
 
-  def setHead[A](l: List[A], h: A): List[A] = ???
+    loop(as)
+  }
+
+  def curry[A, B, C](f: (A, B) => C): A => (B => C) = a => b => f(a, b)
+
+  def uncurry[A, B, C](f: A => B => C): (A, B) => C = (a, b) => f(a)(b)
+
+  def compose[A, B, C](f: B => C, g: A => B): A => C = a => f(g(a))
+
+  def reverseFl[A](as: List[A]): List[A] =
+    foldLeft(as, Nil: List[A])((b, a) => Cons(a, b))
+
+  def appendfR[A](l: List[A], item: A): List[A] =
+    foldRight(l, List(item))((a, b) => Cons(a, b))
+
+  def tail[A](as: List[A]): List[A] = {
+    as match {
+      case Nil              => Nil
+      case Cons(head, tail) => tail
+    }
+  }
+
+  def setHead[A](as: List[A], head: A): List[A] = {
+    as match {
+      case Nil           => Nil
+      case Cons(_, tail) => Cons(head, tail)
+    }
+  }
 
   def drop[A](as: List[A], n: Int): List[A] = as match {
     case Nil                      => Nil
@@ -73,7 +106,12 @@ object List { // `List` companion object. Contains functions for creating and wo
 
   def dropWhile[A](l: List[A], f: A => Boolean): List[A] = ???
 
-  def init[A](l: List[A]): List[A] = ???
+  // Not tail recursive!
+  def init[A](as: List[A]): List[A] = as match {
+    case Nil              => Nil
+    case Cons(head, Nil)  => Nil
+    case Cons(head, tail) => Cons(head, init(tail))
+  }
 
   def length[A](l: List[A]): Int = ???
 
