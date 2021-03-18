@@ -10,6 +10,8 @@ which may be `Nil` or another `Cons`.
  */
 case class Cons[+A](head: A, tail: List[A]) extends List[A]
 
+case class Pair[+A, +B](first: A, second: B)
+
 object List { // `List` companion object. Contains functions for creating and working with lists.
   def sum(ints: List[Int]): Int =
     ints match { // A function that uses pattern matching to add up a list of integers
@@ -153,4 +155,23 @@ object List { // `List` companion object. Contains functions for creating and wo
   def filter2[A](as: List[A])(f: A => Boolean): List[A] =
     flatMap(as)(a => if (f(a)) Cons(a, Nil) else Nil)
 
+  def zip[A, B](as: List[A], bs: List[B]): List[Pair[A, B]] = {
+    if (as == Nil || bs == Nil)
+      Nil
+    else {
+      val Cons(ah, at) = as
+      val Cons(bh, bt) = bs
+
+      Cons(Pair(ah, bh), zip(at, bt))
+    }
+  }
+
+  def zipWith[A, B](as: List[A], bs: List[B])(f: (A, B) => B): List[B] =
+    foldRight[Pair[A, B], List[B]](zip(as, bs), Nil)((pl, acc) => {
+      pl match {
+        case Pair(Nil, _) => Nil
+        case Pair(_, Nil) => Nil
+        case Pair(a, b)   => Cons(f(a, b), acc)
+      }
+    })
 }
