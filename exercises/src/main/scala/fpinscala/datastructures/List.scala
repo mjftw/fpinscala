@@ -136,10 +136,8 @@ object List { // `List` companion object. Contains functions for creating and wo
     flattenAcc[A](ll, Nil)
   }
 
-  def add1(ints: List[Int]): List[Int] = ints match {
-    case Nil              => Nil
-    case Cons(head, tail) => Cons(head + 1, add1(tail))
-  }
+  def add1(ints: List[Int]): List[Int] =
+    foldRight[Int, List[Int]](ints, Nil)((a, acc) => Cons(a + 1, acc))
 
   def doubleToStr(nums: List[Double]): String =
     foldLeft(nums, "")((str, num) => str + " " + num.toString())
