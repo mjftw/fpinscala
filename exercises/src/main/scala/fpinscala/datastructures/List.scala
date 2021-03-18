@@ -78,7 +78,7 @@ object List { // `List` companion object. Contains functions for creating and wo
 
   def compose[A, B, C](f: B => C, g: A => B): A => C = a => f(g(a))
 
-  def reverseFl[A](as: List[A]): List[A] =
+  def reverse[A](as: List[A]): List[A] =
     foldLeft(as, Nil: List[A])((b, a) => Cons(a, b))
 
   def appendfR[A](l: List[A], item: A): List[A] =
@@ -141,5 +141,9 @@ object List { // `List` companion object. Contains functions for creating and wo
     case Cons(head, tail) => Cons(head + 1, add1(tail))
   }
 
-  def map[A, B](l: List[A])(f: A => B): List[B] = ???
+  def doubleToStr(nums: List[Double]): String =
+    foldLeft(nums, "")((str, num) => str + " " + num.toString())
+
+  def map[A, B](l: List[A])(f: A => B): List[B] =
+    foldRight[A, List[B]](l, Nil)((a, b) => Cons(f(a), b))
 }
