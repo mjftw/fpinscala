@@ -166,12 +166,27 @@ object List { // `List` companion object. Contains functions for creating and wo
     }
   }
 
-  def zipWith[A, B](as: List[A], bs: List[B])(f: (A, B) => B): List[B] =
-    foldRight[Pair[A, B], List[B]](zip(as, bs), Nil)((pl, acc) => {
+  def zipWith[A, B, C](as: List[A], bs: List[B])(f: (A, B) => C): List[C] =
+    foldRight[Pair[A, B], List[C]](zip(as, bs), Nil)((pl, acc) => {
       pl match {
         case Pair(Nil, _) => Nil
         case Pair(_, Nil) => Nil
         case Pair(a, b)   => Cons(f(a, b), acc)
       }
     })
+
+  def forAll[A](l: List[A])(f: A => Boolean): Boolean = l match {
+    case Nil                 => true
+    case Cons(h, t) if !f(h) => false
+    case Cons(h, t) if f(h)  => forAll(t)(f)
+  }
+
+  def isPrefix[A](sup: List[A], sub: List[A]): Boolean =
+    forAll(zipWith(sup, sub)((a, b) => a == b))(a => a)
+
+  def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = sup match {
+    case Nil                       => false
+    case _ if (isPrefix(sup, sub)) => true
+    case Cons(h, t)                => hasSubsequence(t, sub)
+  }
 }
