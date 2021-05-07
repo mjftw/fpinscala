@@ -17,11 +17,29 @@ trait Stream[+A] {
     case Empty => None
     case Cons(h, t) => if (f(h())) Some(h()) else t().find(f)
   }
-  def take(n: Int): Stream[A] = ???
 
-  def drop(n: Int): Stream[A] = ???
+  def take(n: Int): Stream[A] = this match {
+    case Empty => Empty
+    case _ if n <= 0 => Empty
+    case Cons(h, t) => cons(h(), t().take(n - 1))
+  }
 
-  def takeWhile(p: A => Boolean): Stream[A] = ???
+  def drop(n: Int): Stream[A] = this match {
+    case Empty => Empty
+    case Cons(h, t) if n > 0 => t().drop(n - 1)
+    case s => s
+  }
+
+  def takeWhile(p: A => Boolean): Stream[A] = this match {
+    case Empty => Empty
+    case Cons(h, _) if !p(h()) => Empty
+    case Cons(h, t) => cons(h(), t().takeWhile(p))
+  }
+
+  def toList(): List[A] = this match {
+    case Empty => Nil
+    case Cons(h, t) => h() :: t().toList()
+  }
 
   def forAll(p: A => Boolean): Boolean = ???
 
@@ -49,7 +67,8 @@ object Stream {
     else cons(as.head, apply(as.tail: _*))
 
   val ones: Stream[Int] = Stream.cons(1, ones)
-  def from(n: Int): Stream[Int] = ???
+  def from(n: Int): Stream[Int] = Stream.cons(n, from(n + 1))
 
   def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = ???
+
 }
