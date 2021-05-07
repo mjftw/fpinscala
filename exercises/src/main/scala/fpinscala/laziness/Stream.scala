@@ -48,7 +48,7 @@ trait Stream[+A] {
     case Cons(h, t) => p(h()) && t().forAll(p)
   }
 
-  def headOption: Option[A] = ???
+  def headOption: Option[A] = this.foldRight(None: Option[A])((hd, _) => Some(hd))
 
   // 5.7 map, filter, append, flatmap using foldRight. Part of the exercise is
   // writing your own function signatures.
