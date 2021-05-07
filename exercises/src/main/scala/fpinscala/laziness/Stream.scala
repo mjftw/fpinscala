@@ -36,6 +36,8 @@ trait Stream[+A] {
     case Cons(h, t) => cons(h(), t().takeWhile(p))
   }
 
+  def takeWhile2(p: A => Boolean): Stream[A] = this.foldRight[Stream[A]](Empty)((hd, acc) => if(p(hd)) cons(hd, acc) else empty)
+
   def toList(): List[A] = this match {
     case Empty => Nil
     case Cons(h, t) => h() :: t().toList()
