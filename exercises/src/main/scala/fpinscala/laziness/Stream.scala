@@ -1,4 +1,4 @@
-package fpinscala.laziness
+// package fpinscala.laziness
 
 import Stream._
 trait Stream[+A] {
@@ -41,7 +41,10 @@ trait Stream[+A] {
     case Cons(h, t) => h() :: t().toList()
   }
 
-  def forAll(p: A => Boolean): Boolean = ???
+  def forAll(p: A => Boolean): Boolean = this match {
+    case Empty => true
+    case Cons(h, t) => p(h()) && t().forAll(p)
+  }
 
   def headOption: Option[A] = ???
 
