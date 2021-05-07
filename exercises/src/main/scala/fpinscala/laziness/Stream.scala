@@ -91,6 +91,15 @@ object Stream {
 
   def from(n: Int): Stream[Int] = Stream.cons(n, from(n + 1))
 
+  def fibs: Stream[Int] = {
+    def loop( nPrev2: Int, nPrev1: Int): Stream[Int] = {
+      lazy val next = nPrev2 + nPrev1
+      Stream.cons(next, loop(nPrev1, next))
+    }
+
+    loop(1, 0)
+  }  
+
   def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = ???
 
 }
