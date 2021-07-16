@@ -75,9 +75,31 @@ object RNG {
     loop(count, rng, Nil)
   }
 
-  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = ???
+  def _double: Rand[Double] =
+    map(nonNegativeInt)(_.toDouble / Int.MaxValue)
 
-  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = ???
+  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = 
+    rng => {
+      val (a, rng2) = ra(rng)
+      val (b, rng3) = rb(rng2)
+      ((f(a, b), rng3))
+    }
+
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = {
+    @tailrec
+    def loop(rng: RNG, lra: List[Rand[A]], la: List[A]): (List[A], RNG) =
+      lra match {
+        case Nil => (la, rng)
+        case ra :: lraTail => {
+          val (a, rng2) = ra(rng)
+          loop(rng2, lraTail, a :: la)
+        }
+      }
+
+    rng => loop(rng, fs, Nil) match {
+      case (la, rng2) => (la.reverse, rng2)
+    }
+  }
 
   def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] = ???
 }
