@@ -145,11 +145,34 @@ object State {
     State(s => (a, s))
 
   def sequence[S, A](ls: List[State[S, A]]): State[S, List[A]] =
-    State(s => ls.foldRight((List.empty[A], s)) {
-      case (ra, (la, s)) => ra.run(s) match {
+    State(s => ls.foldLeft((List.empty[A], s)) {
+      case ((la, s), ra) => ra.run(s) match {
         case (a, s2) => (a :: la, s2)
       }
+    } match {
+      case (as, s) => (as.reverse, s)
     })
 
   def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = ???
+}
+
+object Example {
+  val incr: State[Int, Double] = State(s => ((s + 1).toDouble, s + 1))
+  val decr: State[Int, Double] = State(s => ((s - 1).toDouble, s - 1))
+  val times5: State[Int, Double] = State(s => ((s * 5).toDouble, s * 5))
+  val pow2: State[Int, Double] = State(s => ((s * s).toDouble, s * s))
+
+  def run(x: Int): ((Double, Double, Double, Double), Int) = {
+    val state = for {
+      a <- incr
+      b <- pow2
+      c <- times5
+      d <- decr
+    } yield (a, b, c, d)
+    
+    state.run(x)
+  }
+
+  def sequence(x: Int) =
+    State.sequence(List(incr, decr, times5, pow2)).run(x)
 }
