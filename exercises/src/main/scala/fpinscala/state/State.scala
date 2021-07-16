@@ -1,4 +1,4 @@
-package fpinscala.state
+// package fpinscala.state
 
 
 trait RNG {
@@ -30,7 +30,12 @@ object RNG {
       (f(a), rng2)
     }
 
-  def nonNegativeInt(rng: RNG): (Int, RNG) = ???
+  def nonNegativeInt(rng: RNG): (Int, RNG) = 
+    rng.nextInt match {
+      case (n, rng) if n <= 0 => (-n, rng)
+      case (n, rng) => (n, rng)
+    }
+  
 
   def double(rng: RNG): (Double, RNG) = ???
 
