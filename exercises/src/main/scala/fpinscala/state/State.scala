@@ -82,7 +82,7 @@ object RNG {
     rng => {
       val (a, rng2) = ra(rng)
       val (b, rng3) = rb(rng2)
-      ((f(a, b), rng3))
+      (f(a, b), rng3)
     }
 
   def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = {
@@ -101,7 +101,23 @@ object RNG {
     }
   }
 
-  def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] = ???
+  def flatMap[A,B](f: Rand[A])(g: A => Rand[B]) = {
+    (rng: RNG) => f(rng) match {
+      case (a, rng2) => g(a)(rng2)
+    }
+  }
+  type _Rand[+A] = RNG => (A, RNG)
+
+  def _map[A,B](s: Rand[A])(f: A => B): Rand[B] =
+    flatMap(s)(a => (rng => (f(a), rng)))
+
+  def _map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    flatMap(ra){a =>
+      flatMap(rb){b =>
+        (rng => (f(a, b), rng))
+      }
+    }
+    
 }
 
 case class State[S,+A](run: S => (A, S)) {
